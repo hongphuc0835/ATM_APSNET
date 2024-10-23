@@ -137,9 +137,38 @@ namespace ATMManagementApplication.Controllers
 
             _context.SaveChanges();
 
+            // Gửi email cho người gửi
+            SendEmail(sender.Email, "Transfer Confirmation", $"You have successfully transferred {request.Amount} to {receiver.Name}.");
+
+            // Gửi email cho người nhận
+            SendEmail(receiver.Email, "Money Received", $"You have received {request.Amount} from {sender.Name}.");
+
 
             return Ok(new { Message = "Transfer successful", SenderBalance = sender.Balance, ReceiverBalance = receiver.Balance });
 
+        }
+
+
+        // gui email giao dich
+        private void SendEmail(string toEmail, string subject, string body)
+        {
+            var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("hongphuc0835@gmail.com", "joia vkwu vppg pdvu"),
+                EnableSsl = true,
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress("hongphuc0835@gmail.com"),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true,
+            };
+            mailMessage.To.Add(toEmail);
+
+            smtpClient.Send(mailMessage);
         }
 
 
